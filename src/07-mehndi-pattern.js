@@ -53,21 +53,56 @@
  *   generatePattern(3)        // => ["*", "**", "***", "**", "*"]
  */
 export function repeatChar(char, n) {
-  // Your code here
+  if (typeof char !== "string" || char === "") return "";
+  if (n <= 0) return "";
+  return char + repeatChar(char, n - 1);
 }
 
 export function sumNestedArray(arr) {
-  // Your code here
+  if (!Array.isArray(arr) || arr.length === 0) return 0;
+
+  const first = arr[0];
+  const rest = arr.slice(1);
+
+  let sum = 0;
+
+  if (typeof first === "number") {
+    sum += first;
+  } else if (Array.isArray(first)) {
+    sum += sumNestedArray(first);
+  }
+  return sum + sumNestedArray(rest);
 }
 
 export function flattenArray(arr) {
-  // Your code here
+  if (!Array.isArray(arr)) return [];
+  if (arr.length === 0) return [];
+  const first = arr[0];
+  const rest = arr.slice(1);
+  const ans = [];
+
+  if (Array.isArray(first)) {
+    const nestedArray = flattenArray(first);
+    ans.push(...nestedArray);
+  } else {
+    ans.push(first);
+  }
+  const newArray = flattenArray(rest);
+  ans.push(...newArray);
+  return ans;
 }
 
 export function isPalindrome(str) {
-  // Your code here
+  if (typeof str !== "string") return false;
+  str = str.toLowerCase();
+  if (str.length <= 1) return true;
+  const firstLetter = str[0];
+  const secondLetter = str[str.length - 1];
+  if (firstLetter === secondLetter) return isPalindrome(str.slice(1, str.length - 1));
+  return false;
 }
 
 export function generatePattern(n) {
-  // Your code here
+  if (n <= 0 || !Number.isInteger(n)) return [];
+
 }
