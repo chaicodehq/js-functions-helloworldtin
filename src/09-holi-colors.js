@@ -54,21 +54,65 @@
  *   // red and blue objects are UNCHANGED
  */
 export function mixColors(color1, color2) {
-  // Your code here
+  if (color1 === null || color2 === null || color1 === undefined || color2 === undefined) return null;
+
+  const newName = `${color1.name}-${color2.name}`;
+  const newR = Math.round((color1.r + color2.r) / 2);
+  const newG = Math.round((color1.g + color2.g) / 2);
+  const newB = Math.round((color1.b + color2.b) / 2);
+  return {
+    name: newName,
+    r: newR,
+    g: newG,
+    b: newB,
+  };
 }
 
+function clamp(number) {
+  if (number < 0) {
+    return 0;
+  } else if (number > 255) {
+    return 255;
+  } else {
+    return number;
+  }
+}
 export function adjustBrightness(color, factor) {
-  // Your code here
+  if (color === null || typeof factor !== "number") return null;
+  const r = Math.round(clamp(color.r * factor));
+  const g = Math.round(clamp(color.g * factor));
+  const b = Math.round(clamp(color.b * factor));
+  return { name: color.name, r, g, b };
+
 }
 
 export function addToPalette(palette, color) {
-  // Your code here
+  if (!Array.isArray(palette)) return [color];
+  if (color === null) return Array.from(palette);
+  const newPalette = Array.from(palette);
+  newPalette.push(color);
+  return newPalette;
 }
 
 export function removeFromPalette(palette, colorName) {
-  // Your code here
+  if (!Array.isArray(palette)) return [];
+  const ans = palette.filter((clr) => clr.name !== colorName)
+  return ans;
 }
 
+function colorValue(pal) {
+  const color = [];
+  for (const p of pal) {
+    color.push(p.name);
+  }
+  return color;
+}
 export function mergePalettes(palette1, palette2) {
-  // Your code here
+  const pal1Cpy = Array.isArray(palette1) ? Array.from(palette1) : [];
+  const pal2Cpy = Array.isArray(palette2) ? Array.from(palette2) : [];
+
+  for (const color of pal2Cpy) {
+    if (!colorValue(pal1Cpy).includes(color.name)) pal1Cpy.push(color);
+  }
+  return pal1Cpy;
 }

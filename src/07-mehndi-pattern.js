@@ -103,6 +103,11 @@ export function isPalindrome(str) {
 }
 
 export function generatePattern(n) {
-  if (n <= 0 || !Number.isInteger(n)) return [];
+  if (n <= 0 || !Number.isInteger(n) || n < 1) return [];
 
+  if (n === 1) return ["*"];
+  const smallerPattern = generatePattern(n - 1);
+  const ascending = smallerPattern.slice(0, n - 1);
+  const nStars = repeatChar("*", n);
+  return [...ascending, nStars, ...ascending.reverse()];
 }
