@@ -62,7 +62,7 @@ export const isAllRounder = (battingAvg, economy) => {
 };
 
 export const getPlayerCard = (player) => {
-  if (player === null || player === undefined || !player['namej']) return null;
+  if (player === null || player === undefined || !player['name']) return null;
 
   const name = player.name;
   const strikeRate = calcStrikeRate(player.runs, player.balls);

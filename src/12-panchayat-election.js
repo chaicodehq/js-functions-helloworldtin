@@ -64,17 +64,115 @@
  *   // => "voted!"
  */
 export function createElection(candidates) {
-  // Your code here
+  const votes = [];
+  const registeredVoters = [];
+
+  const registerVoter = (voter) => {
+    const validField = ["id", "name", "age"];
+    if (voter === null || typeof voter !== "object") return false;
+
+    const voterObjectKeys = Object.keys(voter);
+    if (voterObjectKeys.length !== 3) return false;
+
+    for (const key of voterObjectKeys) {
+      if (!validField.includes(key)) return false;
+    }
+
+    if (voter.age < 18) return false;
+
+    const isDuplicateVoterID = registeredVoters.find((vo) => vo.id === voter.id);
+    if (isDuplicateVoterID) return false;
+
+    registeredVoters.push(voter);
+    return true;
+  }
+  const castVote = (voterId, candidateId, onSuccess, onError) => {
+    const isRegistered = registeredVoters.find((user) => user.id === voterId);
+    if (!isRegistered) return onError("Voter does not exist");
+
+    const isCandidateExist = candidates.find((candidate) => candidate.id === candidateId);
+
+    if (!isCandidateExist) return onError("Candidate does't exist");
+
+    const alreadyVoted = votes.find((vote) => vote.voterId === voterId);
+    if (alreadyVoted) return onError("This candidate has already voted.")
+
+    votes.push({ candidateId, voterId });
+    return onSuccess({ voterId, candidateId });
+
+  }
+  const getResults = (sortFn) => {
+    const candidatesResults = candidates.map((candidate) => {
+      const voteCount = votes.reduce((acc, curr) => {
+        if (curr.candidateId === candidate.id) return acc + 1;
+        return acc;
+      }, 0);
+
+      const candidateCpy = structuredClone(candidate);
+      candidateCpy.votes = voteCount;
+      return candidateCpy;
+    });
+
+    if (sortFn || typeof sortFn === "function") return candidatesResults.sort(sortFn);
+    return candidatesResults.sort((a, b) => b.votes - a.votes);
+  }
+
+  const getWinner = () => {
+    if (votes.length === 0) return null;
+    const results = getResults();
+    if (results.length === 0) return null;
+    const winner = results[0];
+
+    return candidates.find((candidate) => candidate.id === winner.id);
+  }
+
+  return { registerVoter, castVote, getResults, getWinner };
 }
 
 export function createVoteValidator(rules) {
-  // Your code here
+  return function (voter) {
+    const voterKeys = Object.keys(voter);
+    if (voterKeys.length !== rules.requiredFields.length) {
+      return {
+        valid: false,
+        reason: "invalid fields"
+      };
+    }
+
+    for (const key of Object.keys(voter)) {
+      if (!rules.requiredFields.includes(key)) return {
+        valid: false,
+        reason: "invalid keys"
+      };
+    }
+
+    if (voter.age < rules.minAge) return { valid: false, reason: "invalid age" };
+
+    return { valid: true }
+  }
 }
 
 export function countVotesInRegions(regionTree) {
-  // Your code here
+  if (regionTree === null || typeof regionTree !== "object") return 0;
+  let totalVote = 0;
+  totalVote += regionTree.votes;
+
+  if (regionTree.subRegions.length > 0) {
+    for (const newRegion of regionTree.subRegions) {
+      totalVote += countVotesInRegions(newRegion);
+    }
+  }
+
+  return totalVote;
 }
 
 export function tallyPure(currentTally, candidateId) {
-  // Your code here
+  const currentTallyCpy = structuredClone(currentTally);
+
+  const currentTallyKeys = Object.keys(currentTally);
+  for (const key of currentTallyKeys) {
+    if (candidateId === key) currentTallyCpy[key]++;
+  }
+  if (!currentTallyCpy[candidateId]) currentTallyCpy[candidateId] = 1;
+  return currentTallyCpy;
 }
